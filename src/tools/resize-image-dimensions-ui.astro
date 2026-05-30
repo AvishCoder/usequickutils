@@ -1,0 +1,43 @@
+<div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold tracking-[-0.04em] mb-2">Resize Image</h1>
+    <p class="text-gray-400 dark:text-gray-500 mb-8 tracking-[-0.04em]">Resize images to exact pixel dimensions.</p>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="space-y-6">
+        <div id="dropzone" class="border-2 border-dashed border-border dark:border-dark-border rounded-[6px] p-12 text-center cursor-pointer hover:border-black dark:hover:border-white transition-all duration-150">
+          <div class="flex flex-col items-center gap-3">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-gray-400" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p class="text-sm text-gray-500 dark:text-gray-400 tracking-[-0.04em]">Drop an image here, or <span class="text-black dark:text-white underline">browse</span></p>
+            <input id="file-input" type="file" accept="image/*" class="hidden" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-sm font-medium mb-2 tracking-[-0.04em]">Width (px)</label><input id="width-input" type="number" value="800" min="1" class="w-full px-4 py-2 rounded-[6px] border border-border dark:border-dark-border bg-white dark:bg-dark-surface text-sm tracking-[-0.04em] focus:outline-none focus:border-black dark:focus:border-white transition-colors" /></div>
+          <div><label class="block text-sm font-medium mb-2 tracking-[-0.04em]">Height (px)</label><input id="height-input" type="number" value="600" min="1" class="w-full px-4 py-2 rounded-[6px] border border-border dark:border-dark-border bg-white dark:bg-dark-surface text-sm tracking-[-0.04em] focus:outline-none focus:border-black dark:focus:border-white transition-colors" /></div>
+        </div>
+        <label class="flex items-center gap-2 text-sm tracking-[-0.04em] cursor-pointer"><input id="lock-ratio" type="checkbox" checked class="accent-black dark:accent-white" /> Lock Aspect Ratio</label>
+        <div id="file-status" class="hidden border border-border dark:border-dark-border rounded-[6px] p-4 bg-white dark:bg-dark-surface">
+          <div class="flex items-center gap-3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-green-500 shrink-0" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <div><p id="file-name" class="text-sm font-medium tracking-[-0.04em]"></p><p class="text-xs text-gray-400 tracking-[-0.04em]">Loaded successfully</p></div>
+          </div>
+        </div>
+        <button id="resize-btn" disabled class="w-full py-3 rounded-[6px] bg-black text-white dark:bg-white dark:text-black font-semibold text-sm tracking-[-0.04em] disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 transition-opacity">Resize</button>
+      </div>
+      <div id="output-panel" class="hidden space-y-4">
+        <div class="border border-border dark:border-dark-border rounded-[6px] p-4 bg-white dark:bg-dark-surface"><img id="preview" class="max-w-full max-h-80 mx-auto rounded-[6px]" alt="Resized preview" /></div>
+        <div class="text-[11px] font-mono text-gray-500"><p id="dimension-info" class="tracking-[0.05em] uppercase"></p></div>
+        <button id="download-btn" class="w-full py-3 rounded-full bg-black text-white dark:bg-white dark:text-black font-semibold text-sm tracking-[-0.04em] hover:opacity-90 transition-opacity">Download Resized Image</button>
+      </div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    const dz=document.getElementById("dropzone"),fi=document.getElementById("file-input"),fs=document.getElementById("file-status"),fn=document.getElementById("file-name"),wi=document.getElementById("width-input"),hi=document.getElementById("height-input"),lr=document.getElementById("lock-ratio"),rb=document.getElementById("resize-btn"),op=document.getElementById("output-panel"),pv=document.getElementById("preview"),di=document.getElementById("dimension-info"),db=document.getElementById("download-btn");
+    let f=null,nr=1,rdu=null;
+    dz.onclick=()=>fi.click();dz.ondragover=e=>{e.preventDefault();dz.classList.add("border-black","dark:border-white")};dz.ondragleave=()=>{dz.classList.remove("border-black","dark:border-white")};dz.ondrop=e=>{e.preventDefault();dz.classList.remove("border-black","dark:border-white");const file=e.dataTransfer?.files?.[0];if(file)hF(file)};fi.onchange=()=>{if(fi.files?.[0])hF(fi.files[0])};
+    function hF(file){f=file;fn.textContent=file.name;fs.classList.remove("hidden");const img=new Image();img.src=URL.createObjectURL(file);img.onload=()=>{nr=img.naturalWidth/img.naturalHeight;wi.value=String(img.naturalWidth);hi.value=String(img.naturalHeight);rb.disabled=false}}
+    wi.oninput=()=>{if(lr.checked&&f)hi.value=String(Math.round(parseInt(wi.value||"0")/nr))};hi.oninput=()=>{if(lr.checked&&f)wi.value=String(Math.round(parseInt(hi.value||"0")*nr))};
+    rb.onclick=()=>{if(!f)return;const w=parseInt(wi.value)||800,h=parseInt(hi.value)||600;const img=new Image();img.src=URL.createObjectURL(f);img.onload=()=>{const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");x.drawImage(img,0,0,w,h);rdu=c.toDataURL("image/jpeg",0.92);pv.src=rdu;di.textContent=w+" × "+h+" px";op.classList.remove("hidden")}};
+    db.onclick=()=>{if(!rdu)return;const a=document.createElement("a");a.href=rdu;a.download="resized-image.jpg";a.click()};
+  })();
+  </script>

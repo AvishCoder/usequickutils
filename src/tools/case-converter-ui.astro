@@ -1,0 +1,24 @@
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold tracking-[-0.04em] mb-2">Case Converter</h1>
+    <p class="text-gray-400 dark:text-gray-500 mb-8 tracking-[-0.04em]">Transform text between uppercase, lowercase & more.</p>
+    <textarea id="text-input" placeholder="Paste or type your text here..." class="w-full min-h-[300px] p-6 rounded-[6px] border border-border dark:border-dark-border bg-white dark:bg-dark-surface text-base font-mono tracking-[-0.04em] focus:outline-none focus:border-black dark:focus:border-white transition-colors resize-y"></textarea>
+    <div class="flex flex-wrap gap-3 mt-6">
+      <button data-transform="uppercase" class="transform-btn px-6 py-2 rounded-[6px] border border-border dark:border-dark-border bg-white dark:bg-dark-surface text-sm font-mono font-semibold tracking-[-0.04em] hover:bg-gray-100 dark:hover:bg-[#181818] transition-colors">UPPERCASE</button>
+      <button data-transform="lowercase" class="transform-btn px-6 py-2 rounded-[6px] border border-border dark:border-dark-border bg-white dark:bg-dark-surface text-sm font-mono font-semibold tracking-[-0.04em] hover:bg-gray-100 dark:hover:bg-[#181818] transition-colors">lowercase</button>
+      <button data-transform="title" class="transform-btn px-6 py-2 rounded-[6px] border border-border dark:border-dark-border bg-white dark:bg-dark-surface text-sm font-mono font-semibold tracking-[-0.04em] hover:bg-gray-100 dark:hover:bg-[#181818] transition-colors">Title Case</button>
+      <button data-transform="sentence" class="transform-btn px-6 py-2 rounded-[6px] border border-border dark:border-dark-border bg-white dark:bg-dark-surface text-sm font-mono font-semibold tracking-[-0.04em] hover:bg-gray-100 dark:hover:bg-[#181818] transition-colors">Sentence case</button>
+    </div>
+    <div class="flex items-center justify-between mt-6">
+      <div class="flex gap-6 text-xs font-mono text-gray-400 uppercase tracking-[0.05em]"><span>Words: <strong id="word-count" class="text-black dark:text-white">0</strong></span><span>Chars: <strong id="char-count" class="text-black dark:text-white">0</strong></span></div>
+      <button id="copy-btn" class="px-8 py-3 rounded-full bg-black text-white dark:bg-white dark:text-black font-semibold text-sm tracking-[-0.04em] hover:opacity-90 transition-opacity">Copy to Clipboard</button>
+    </div>
+  </div>
+  <script>
+  (function(){
+    const ta=document.getElementById("text-input"),wc=document.getElementById("word-count"),cc=document.getElementById("char-count"),cb=document.getElementById("copy-btn");
+    function uS(t){const tr=t.trim();wc.textContent=tr?tr.split(/\s+/).length+"":"0";cc.textContent=t.length+""}
+    ta.addEventListener("input",()=>uS(ta.value));uS(ta.value);
+    document.querySelectorAll(".transform-btn").forEach(b=>{b.addEventListener("click",()=>{const t=b.dataset.transform,text=ta.value;let r=text;switch(t){case"uppercase":r=text.toUpperCase();break;case"lowercase":r=text.toLowerCase();break;case"title":r=text.replace(/\b\w/g,c=>c.toUpperCase());break;case"sentence":r=text.replace(/(^\s*\w|[.!?]\s*\w)/g,c=>c.toUpperCase());break}ta.value=r;uS(r)})});
+    cb.onclick=async()=>{try{await navigator.clipboard.writeText(ta.value);const o=cb.textContent;cb.textContent="Copied!";cb.style.opacity=".7";setTimeout(()=>{cb.textContent=o;cb.style.opacity="1"},1500)}catch{ta.select();document.execCommand("copy")}};
+  })();
+  </script>

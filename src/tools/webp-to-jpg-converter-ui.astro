@@ -1,0 +1,30 @@
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold tracking-[-0.04em] mb-2">WebP to JPG Converter</h1>
+    <p class="text-gray-400 dark:text-gray-500 mb-8 tracking-[-0.04em]">Convert WebP images to JPG or PNG instantly.</p>
+    <div id="dropzone" class="border-2 border-dashed border-border dark:border-dark-border rounded-[6px] p-12 text-center cursor-pointer hover:border-black dark:hover:border-white transition-all duration-150 mb-6">
+      <div class="flex flex-col items-center gap-3">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-gray-400" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p class="text-sm text-gray-500 dark:text-gray-400 tracking-[-0.04em]">Drop a .webp file here, or <span class="text-black dark:text-white underline">browse</span></p>
+        <input id="file-input" type="file" accept=".webp,image/webp" class="hidden" />
+      </div>
+    </div>
+    <div class="flex gap-4 mb-6">
+      <select id="format-select" class="flex-1 px-4 py-2 rounded-[6px] border border-border dark:border-dark-border bg-white dark:bg-dark-surface text-sm tracking-[-0.04em] focus:outline-none focus:border-black dark:focus:border-white transition-colors"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option></select>
+      <button id="convert-btn" disabled class="flex-1 py-2 rounded-[6px] bg-black text-white dark:bg-white dark:text-black font-semibold text-sm tracking-[-0.04em] disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 transition-opacity">Convert & Download</button>
+      <div id="file-status" class="hidden border border-border dark:border-dark-border rounded-[6px] p-4 bg-white dark:bg-dark-surface">
+        <div class="flex items-center gap-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-green-500 shrink-0" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <div><p id="file-name" class="text-sm font-medium tracking-[-0.04em]"></p><p class="text-xs text-gray-400 tracking-[-0.04em]">Loaded successfully</p></div>
+        </div>
+      </div>
+    </div>
+    <div id="preview-area" class="hidden border border-border dark:border-dark-border rounded-[6px] p-4 bg-white dark:bg-dark-surface"><img id="preview" class="max-w-full max-h-80 mx-auto rounded-[6px]" alt="Converted preview" /></div>
+  </div>
+  <script>
+  (function(){
+    const dz=document.getElementById("dropzone"),fi=document.getElementById("file-input"),fs2=document.getElementById("file-status"),fn=document.getElementById("file-name"),fs1=document.getElementById("format-select"),cv=document.getElementById("convert-btn"),pa=document.getElementById("preview-area"),pv=document.getElementById("preview");let f=null;
+    dz.onclick=()=>fi.click();dz.ondragover=e=>{e.preventDefault();dz.classList.add("border-black","dark:border-white")};dz.ondragleave=()=>{dz.classList.remove("border-black","dark:border-white")};dz.ondrop=e=>{e.preventDefault();dz.classList.remove("border-black","dark:border-white");const file=e.dataTransfer?.files?.[0];if(file)hF(file)};fi.onchange=()=>{if(fi.files?.[0])hF(fi.files[0])};
+    function hF(file){if(!file.type.includes("webp")&&!file.name.toLowerCase().endsWith(".webp")){alert("Please select a WebP file.");return}f=file;fn.textContent=file.name;fs2.classList.remove("hidden");cv.disabled=false}
+    cv.onclick=()=>{if(!f)return;const img=new Image();img.src=URL.createObjectURL(f);img.onload=()=>{const c=document.createElement("canvas");c.width=img.naturalWidth;c.height=img.naturalHeight;const x=c.getContext("2d");x.drawImage(img,0,0);const m=fs.value,ext=m==="image/png"?"png":"jpg";c.toBlob(blob=>{if(!blob)return;const u=URL.createObjectURL(blob);pv.src=u;pa.classList.remove("hidden");const a=document.createElement("a");a.href=u;a.download="converted-image."+ext;a.click()},m,0.92)}};
+  })();
+  </script>

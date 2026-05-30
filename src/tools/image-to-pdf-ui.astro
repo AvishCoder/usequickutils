@@ -1,0 +1,28 @@
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold tracking-[-0.04em] mb-2">Image to PDF</h1>
+    <p class="text-gray-400 dark:text-gray-500 mb-8 tracking-[-0.04em]">Combine multiple images into a single PDF document.</p>
+    <div id="dropzone" class="border-2 border-dashed border-border dark:border-dark-border rounded-[6px] p-12 text-center cursor-pointer hover:border-black dark:hover:border-white transition-all duration-150 mb-6">
+      <div class="flex flex-col items-center gap-3">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-gray-400" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p class="text-sm text-gray-500 dark:text-gray-400 tracking-[-0.04em]">Drop images here, or <span class="text-black dark:text-white underline">browse</span></p>
+        <input id="file-input" type="file" accept="image/*" multiple class="hidden" />
+      </div>
+    </div>
+    <div id="file-status" class="hidden border border-border dark:border-dark-border rounded-[6px] p-4 bg-white dark:bg-dark-surface">
+      <div class="flex items-center gap-3">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-green-500 shrink-0" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <div><p id="file-count" class="text-sm font-medium tracking-[-0.04em]"></p><p class="text-xs text-gray-400 tracking-[-0.04em]">Loaded successfully</p></div>
+      </div>
+    </div>
+    <div id="file-list" class="space-y-2 mb-6"></div>
+    <button id="generate-btn" disabled class="w-full py-3 rounded-[6px] bg-black text-white dark:bg-white dark:text-black font-semibold text-sm tracking-[-0.04em] disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 transition-opacity">Generate PDF</button>
+  </div>
+  <script>
+  (function(){
+    const dz=document.getElementById("dropzone"),fi=document.getElementById("file-input"),fs=document.getElementById("file-status"),fc=document.getElementById("file-count"),fl=document.getElementById("file-list"),gb=document.getElementById("generate-btn");let files=[];
+    dz.onclick=()=>fi.click();dz.ondragover=e=>{e.preventDefault();dz.classList.add("border-black","dark:border-white")};dz.ondragleave=()=>{dz.classList.remove("border-black","dark:border-white")};dz.ondrop=e=>{e.preventDefault();dz.classList.remove("border-black","dark:border-white");const d=Array.from(e.dataTransfer?.files||[]);if(d.length)aF(d)};fi.onchange=()=>{if(fi.files?.length)aF(Array.from(fi.files));fi.value=""};
+    function aF(n){files=[...files,...n.filter(f=>f.type.startsWith("image/"))];fc.textContent=files.length+" image"+(files.length>1?"s":"")+" selected";fs.classList.remove("hidden");rF();gb.disabled=false}
+    function rF(){fl.innerHTML=files.map((f,i)=>'<div class="flex items-center justify-between px-4 py-3 rounded-[6px] border border-border dark:border-dark-border bg-white dark:bg-dark-surface"><span class="text-sm tracking-[-0.04em]">'+(i+1)+'. '+f.name+'</span><button data-index="'+i+'" class="remove-btn text-xs text-red-500 hover:text-red-700">Remove</button></div>').join("");document.querySelectorAll(".remove-btn").forEach(b=>b.addEventListener("click",()=>{const idx=parseInt(b.dataset.index);files.splice(idx,1);rF();if(files.length===0){gb.disabled=true;fs.classList.add("hidden")}}))}
+    gb.onclick=async()=>{if(files.length===0)return;gb.disabled=true;gb.textContent="Generating PDF...";const{jsPDF}=await import("https://cdn.jsdelivr.net/npm/jspdf@2.5.2/+esm");const pdf=new jsPDF();let fp=true;for(const file of files){const img=new Image();img.src=URL.createObjectURL(file);await img.decode();const w=img.naturalWidth,h=img.naturalHeight,mx=190,mh=277,ratio=Math.min(mx/w,mh/h),rw=Math.round(w*ratio),rh=Math.round(h*ratio),ox=(mx-rw)/2,oy=(mh-rh)/2;if(!fp)pdf.addPage();pdf.addImage(img,"JPEG",ox,oy,rw,rh);fp=false}pdf.save("images.pdf");gb.disabled=false;gb.textContent="Generate PDF"};
+  })();
+  </script>

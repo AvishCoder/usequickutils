@@ -1,0 +1,36 @@
+---
+import BaseLayout from "~/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Contact" description="Contact usequickutils.com. Reach us at support@usequickutils.com.">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold tracking-[-0.04em] mb-2">Contact</h1>
+    <p class="text-gray-500 dark:text-gray-400 mb-10 tracking-[-0.04em]">
+      Have feedback or questions? We'd love to hear from you.
+    </p>
+
+    <div class="border border-border dark:border-dark-border rounded-[6px] p-8 bg-white dark:bg-dark-surface">
+      <div class="flex items-center gap-4 mb-8">
+        <div class="w-12 h-12 rounded-[6px] bg-black dark:bg-white flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" class="dark:hidden" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+          </svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" class="hidden dark:block" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-medium tracking-[-0.04em]">Email</p>
+          <a href="mailto:support@usequickutils.com" class="text-sm text-gray-500 dark:text-gray-400 hover:underline tracking-[-0.04em]">
+            support@usequickutils.com
+          </a>
+        </div>
+      </div>
+
+      <p class="text-xs text-gray-400 tracking-[-0.04em]">
+        We typically respond within 24 hours. Your data and messages are handled in accordance with our 
+        <a href="/privacy-policy" class="underline hover:text-black dark:hover:text-white">Privacy Policy</a>.
+      </p>
+    </div>
+  </div>
+</BaseLayout>

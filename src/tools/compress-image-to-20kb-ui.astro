@@ -1,0 +1,153 @@
+<div class="max-w-6xl mx-auto">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold tracking-[-0.04em]">Compress Image to 20KB</h1>
+    <p class="text-gray-400 dark:text-gray-500 mt-1.5 text-sm tracking-[-0.04em]">
+      Downscale & binary-search compression to hit exactly 20KB.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+    <div class="space-y-5">
+      <div id="dropzone" class="relative border-2 border-dashed border-border dark:border-dark-border rounded-[6px] p-14 text-center cursor-pointer hover:border-black dark:hover:border-white transition-all duration-200 group active:scale-[0.99]">
+        <input id="file-input" type="file" accept="image/*" class="hidden" />
+        <div class="flex flex-col items-center gap-3 pointer-events-none">
+          <div class="w-12 h-12 rounded-full bg-gray-50 dark:bg-[#181818] flex items-center justify-center group-hover:bg-gray-100 dark:group-hover:bg-[#222] transition-colors">
+            <svg class="text-gray-300 dark:text-gray-600 group-hover:text-gray-400 dark:group-hover:text-gray-500 transition-colors" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm text-gray-400 dark:text-gray-500 tracking-[-0.04em]">
+              Drop image here or <span class="text-black dark:text-white underline underline-offset-2 font-medium">browse</span>
+            </p>
+            <p class="text-[11px] text-gray-300 dark:text-gray-600 font-mono uppercase tracking-[0.08em] mt-2">PNG &middot; JPEG &middot; WebP</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="file-status" class="hidden border border-border dark:border-dark-border rounded-[6px] p-4 bg-white dark:bg-dark-surface">
+        <div class="flex items-center gap-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-green-500 shrink-0" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <div><p id="file-name" class="text-sm font-medium tracking-[-0.04em]"></p><p class="text-xs text-gray-400 tracking-[-0.04em]">Loaded successfully</p></div>
+        </div>
+      </div>
+
+      <div class="rounded-[6px] border border-border dark:border-dark-border bg-white dark:bg-dark-surface">
+        <div class="px-4 pt-4 pb-3">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[11px] font-mono font-semibold uppercase tracking-[0.08em] text-gray-400">Target Ceiling</span>
+            <span class="text-xs font-mono font-bold tracking-[-0.04em] text-black dark:text-white bg-gray-50 dark:bg-[#181818] px-2 py-0.5 rounded-[4px]">20 KB</span>
+          </div>
+          <div class="relative h-1 rounded-full bg-gray-100 dark:bg-[#181818] mt-3 overflow-hidden">
+            <div id="target-bar" class="absolute inset-y-0 right-0 w-0 bg-black dark:bg-white rounded-full transition-all duration-500 ease-out"></div>
+          </div>
+          <div class="flex justify-between text-[10px] font-mono text-gray-300 dark:text-gray-600 mt-1.5">
+            <span>0 KB</span>
+            <span>500 KB</span>
+          </div>
+        </div>
+      </div>
+
+      <button
+        id="compress-btn"
+        disabled
+        class="w-full py-3 rounded-[6px] bg-black text-white dark:bg-white dark:text-black font-semibold text-sm tracking-[-0.04em] disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98] transition-all duration-150"
+      >
+        Compress to 20KB
+      </button>
+
+      <div id="status-bar" class="hidden space-y-2.5">
+        <div class="flex items-center gap-2.5 text-xs font-mono text-gray-400">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-black dark:bg-white animate-pulse"></span>
+          <span id="status-text">Initialising pipeline…</span>
+        </div>
+        <div class="flex gap-2">
+          <span id="stage-1" class="text-[10px] font-mono px-2.5 py-1 rounded-full border border-border dark:border-dark-border text-gray-300 dark:text-gray-600">Downscale</span>
+          <span id="stage-2" class="text-[10px] font-mono px-2.5 py-1 rounded-full border border-border dark:border-dark-border text-gray-300 dark:text-gray-600">Binary Search</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="output-panel" class="hidden space-y-5">
+      <div class="rounded-[6px] border border-border dark:border-dark-border bg-white dark:bg-dark-surface overflow-hidden">
+        <div class="px-4 py-2 border-b border-border dark:border-dark-border bg-gray-50 dark:bg-[#0f0f0f]">
+          <span class="text-[10px] font-mono font-semibold uppercase tracking-[0.08em] text-gray-400">Live Preview</span>
+        </div>
+        <div class="p-4 flex items-center justify-center min-h-[200px]">
+          <img id="preview" class="max-w-full max-h-72 object-contain rounded-[4px]" alt="Compressed result" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2.5 text-[11px] font-mono uppercase tracking-[0.05em]">
+        <div class="border border-border dark:border-dark-border rounded-[6px] p-3 bg-white dark:bg-dark-surface">
+          <span class="text-gray-400 flex items-center gap-1.5">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>
+            Original
+          </span>
+          <p id="original-size" class="text-sm font-semibold mt-1.5 text-black dark:text-white">—</p>
+          <p id="original-dims" class="text-gray-400 mt-0.5">—</p>
+        </div>
+        <div class="border border-border dark:border-dark-border rounded-[6px] p-3 bg-white dark:bg-dark-surface">
+          <span class="text-gray-400 flex items-center gap-1.5">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+            Quality
+          </span>
+          <p id="quality-value" class="text-sm font-semibold mt-1.5 text-black dark:text-white">—</p>
+          <p id="format-label" class="text-gray-400 mt-0.5">JPEG</p>
+        </div>
+        <div class="border border-border dark:border-dark-border rounded-[6px] p-3 bg-white dark:bg-dark-surface">
+          <span class="text-gray-400 flex items-center gap-1.5">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Compressed
+          </span>
+          <p id="compressed-size" class="text-sm font-semibold mt-1.5 text-black dark:text-white">—</p>
+          <p id="compressed-dims" class="text-gray-400 mt-0.5">—</p>
+        </div>
+        <div class="border border-border dark:border-dark-border rounded-[6px] p-3 bg-white dark:bg-dark-surface">
+          <span class="text-gray-400 flex items-center gap-1.5">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+            Savings
+          </span>
+          <p id="savings-value" class="text-sm font-semibold mt-1.5 text-black dark:text-white">—</p>
+          <p id="ratio-value" class="text-gray-400 mt-0.5">—</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5 px-3 py-2 rounded-[6px] bg-gray-50 dark:bg-[#0f0f0f] border border-border dark:border-dark-border">
+        <span class="text-[10px] font-mono font-semibold uppercase tracking-[0.08em] text-gray-400">Scale</span>
+        <span id="scale-factor" class="text-[10px] font-mono text-black dark:text-white font-medium">—</span>
+        <span class="text-gray-300 dark:text-gray-600">&middot;</span>
+        <span id="render-dims" class="text-[10px] font-mono text-gray-500">—</span>
+        <span class="text-gray-300 dark:text-gray-600">&middot;</span>
+        <span id="status-value" class="text-[10px] font-mono font-semibold">—</span>
+      </div>
+
+      <button
+        id="download-btn"
+        class="w-full py-3 rounded-full bg-black text-white dark:bg-white dark:text-black font-semibold text-sm tracking-[-0.04em] hover:opacity-90 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2.5"
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download Compressed JPEG
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TARGET_KB=20,TARGET_BYTES=TARGET_KB*1024,MAX_DIMENSION=1000,PRECISION=0.02;
+  const $=id=>document.getElementById(id);
+  const dz=$("dropzone"),fi=$("file-input"),fs=$("file-status"),fn=$("file-name"),cb=$("compress-btn"),sb=$("status-bar"),st=$("status-text"),s1=$("stage-1"),s2=$("stage-2"),op=$("output-panel"),pv=$("preview"),os=$("original-size"),od=$("original-dims"),sf=$("scale-factor"),rd=$("render-dims"),qv=$("quality-value"),fl=$("format-label"),cs=$("compressed-size"),cd=$("compressed-dims"),rv=$("ratio-value"),sv=$("savings-value"),stv=$("status-value"),db=$("download-btn"),tb=$("target-bar");
+  const fState={file:null,name:"",originalKB:0};let cDataUrl=null;
+  function fmt(b){return(b/1024).toFixed(1)+" KB"}
+  function setStg(i){[s1,s2].forEach((e,j)=>{e.className=j===i?"text-[10px] font-mono px-2.5 py-1 rounded-full bg-black text-white dark:bg-white dark:text-black":j<i?"text-[10px] font-mono px-2.5 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400":"text-[10px] font-mono px-2.5 py-1 rounded-full border border-border dark:border-dark-border text-gray-300 dark:text-gray-600"})}
+  function hFile(file){if(!file||!file.type.startsWith("image/"))return;fState.file=file;fState.name=file.name;fState.originalKB=file.size;fn.textContent=file.name;fs.classList.remove("hidden");cb.disabled=false;op.classList.add("hidden");tb.style.width="0%"}
+  dz.onclick=()=>fi.click();dz.ondragover=e=>{e.preventDefault();dz.classList.add("border-black","dark:border-white","bg-gray-50","dark:bg-[#0f0f0f]")};dz.ondragleave=()=>{dz.classList.remove("border-black","dark:border-white","bg-gray-50","dark:bg-[#0f0f0f]")};dz.ondrop=e=>{e.preventDefault();dz.classList.remove("border-black","dark:border-white","bg-gray-50","dark:bg-[#0f0f0f]");hFile(e.dataTransfer.files[0])};fi.onchange=()=>{if(fi.files[0])hFile(fi.files[0])};
+  function stg1(img){let w=img.naturalWidth,h=img.naturalHeight,s=1;if(w>MAX_DIMENSION||h>MAX_DIMENSION){s=Math.min(MAX_DIMENSION/w,MAX_DIMENSION/h);w=Math.round(w*s);h=Math.round(h*s)}const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");x.imageSmoothingEnabled=true;x.imageSmoothingQuality="high";x.drawImage(img,0,0,w,h);return{canvas:c,w,h,scale:s}}
+  function stg2(c){let l=PRECISION,h=1.0,b=null;while(l<=h){const q=Math.round((l+h)/2/PRECISION)*PRECISION,du=c.toDataURL("image/jpeg",q),by=Math.round(du.length*.75);if(by<=TARGET_BYTES){b={dataUrl:du,bytes:by,quality:q};l=q+PRECISION}else{h=q-PRECISION}}return b}
+  cb.onclick=async()=>{if(!fState.file)return;cb.disabled=true;cb.textContent="Running pipeline…";op.classList.add("hidden");sb.classList.remove("hidden");st.textContent="Decoding image asset…";setStg(0);const img=new Image(),ou=URL.createObjectURL(fState.file);img.src=ou;await img.decode();const ow=img.naturalWidth,oh=img.naturalHeight;st.textContent="Stage 1: Intelligent downscaling…";await new Promise(r=>setTimeout(r,50));const{canvas,w,h,scale}=stg1(img);URL.revokeObjectURL(ou);setStg(1);st.textContent="Stage 2: Precision binary search (±0.02)…";await new Promise(r=>setTimeout(r,50));const res=stg2(canvas);setStg(2);const fdu=res?res.dataUrl:canvas.toDataURL("image/jpeg",PRECISION),fby=res?res.bytes:Math.round(fdu.length*.75),fq=res?res.quality:PRECISION;cDataUrl=fdu;const cr=((1-fby/fState.file.size)*100).toFixed(1),sav=((fState.file.size-fby)/1024).toFixed(1),sp=(scale*100).toFixed(0);pv.src=fdu;os.textContent=fmt(fState.file.size);od.textContent=ow+" × "+oh+" px";sf.textContent=scale<1?sp+"%":"100%";rd.textContent=w+" × "+h+" px";qv.textContent=Math.round(fq*100)+"%";fl.textContent="JPEG";cs.textContent=fmt(fby);cd.textContent=w+" × "+h+" px";rv.textContent="-"+cr+"%";sv.textContent=sav+" KB";stv.textContent=fby<=TARGET_BYTES?"PASS":"NEAR";tb.style.width=Math.min(100,(fby/TARGET_BYTES)*100)+"%";sb.classList.add("hidden");op.classList.remove("hidden");cb.disabled=false;cb.textContent="Re-compress to 20KB"};
+  db.onclick=()=>{if(!cDataUrl)return;const a=document.createElement("a");a.href=cDataUrl;a.download=(fState.name.replace(/\.[^.]+$/,"")||"image")+"-compressed-20kb.jpg";a.click()};
+})();
+</script>

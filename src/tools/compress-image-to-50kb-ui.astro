@@ -1,0 +1,54 @@
+<div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold tracking-[-0.04em] mb-2">Compress Image to 50KB</h1>
+    <p class="text-gray-400 dark:text-gray-500 mb-8 tracking-[-0.04em]">Compress images to 50KB with quality preservation.</p>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="space-y-6">
+        <div id="dropzone" class="border-2 border-dashed border-border dark:border-dark-border rounded-[6px] p-12 text-center cursor-pointer hover:border-black dark:hover:border-white transition-all duration-150">
+          <div class="flex flex-col items-center gap-3">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-gray-400" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p class="text-sm text-gray-500 dark:text-gray-400 tracking-[-0.04em]">Drop an image here, or <span class="text-black dark:text-white underline">browse</span></p>
+            <input id="file-input" type="file" accept="image/*" class="hidden" />
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <button id="mode-lossless" class="flex-1 py-2 rounded-[6px] border-2 border-black dark:border-white bg-black text-white dark:bg-white dark:text-black font-semibold text-sm tracking-[-0.04em] transition-all">Lossless (PNG)</button>
+          <button id="mode-optimized" class="flex-1 py-2 rounded-[6px] border-2 border-border dark:border-dark-border bg-white dark:bg-dark-surface text-sm font-semibold tracking-[-0.04em] text-gray-600 dark:text-gray-400 hover:border-black dark:hover:border-white transition-all">Optimized (JPEG)</button>
+        </div>
+        <div id="optimized-controls" style="display:none">
+          <label class="block text-sm font-medium mb-2 tracking-[-0.04em]">Target Size (KB)</label>
+          <input id="target-kb" type="number" value="50" min="1" max="500" class="w-full px-4 py-2 rounded-[6px] border border-border dark:border-dark-border bg-white dark:bg-dark-surface text-sm tracking-[-0.04em] focus:outline-none focus:border-black dark:focus:border-white transition-colors" />
+          <input id="target-slider" type="range" min="1" max="500" value="50" class="w-full mt-3 accent-black dark:accent-white" />
+          <div class="flex justify-between text-xs text-gray-400 mt-1"><span>1 KB</span><span id="slider-label">50 KB</span><span>500 KB</span></div>
+        </div>
+        <div id="file-status" class="hidden border border-border dark:border-dark-border rounded-[6px] p-4 bg-white dark:bg-dark-surface">
+          <div class="flex items-center gap-3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-green-500 shrink-0" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <div><p id="file-name" class="text-sm font-medium tracking-[-0.04em]"></p><p class="text-xs text-gray-400 tracking-[-0.04em]">Loaded successfully</p></div>
+          </div>
+        </div>
+        <button id="compress-btn" disabled class="w-full py-3 rounded-[6px] bg-black text-white dark:bg-white dark:text-black font-semibold text-sm tracking-[-0.04em] disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 transition-opacity">Process Lossless PNG</button>
+      </div>
+      <div id="output-panel" class="hidden space-y-4">
+        <div class="border border-border dark:border-dark-border rounded-[6px] p-4 bg-white dark:bg-dark-surface"><img id="preview" class="max-w-full max-h-80 mx-auto rounded-[6px]" alt="Processed preview" /></div>
+        <div class="grid grid-cols-3 gap-3 text-[11px] font-mono uppercase tracking-[0.05em]">
+          <div class="border border-border dark:border-dark-border rounded-[6px] p-3 bg-white dark:bg-dark-surface"><span class="text-gray-400">Original</span><p id="original-size" class="text-base font-semibold mt-1">—</p><p id="original-dims" class="text-gray-400 mt-0.5">—</p></div>
+          <div class="border border-border dark:border-dark-border rounded-[6px] p-3 bg-white dark:bg-dark-surface"><span class="text-gray-400">Processed</span><p id="compressed-size" class="text-base font-semibold mt-1">—</p><p id="compressed-dims" class="text-gray-400 mt-0.5">—</p></div>
+          <div class="border border-border dark:border-dark-border rounded-[6px] p-3 bg-white dark:bg-dark-surface"><span class="text-gray-400">Quality</span><p id="quality-info" class="text-base font-semibold mt-1">—</p><p id="format-info" class="text-gray-400 mt-0.5">—</p></div>
+        </div>
+        <button id="download-btn" class="w-full py-3 rounded-full bg-black text-white dark:bg-white dark:text-black font-semibold text-sm tracking-[-0.04em] hover:opacity-90 transition-opacity">Download Processed File</button>
+      </div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    const dz=document.getElementById("dropzone"),fi=document.getElementById("file-input"),fs=document.getElementById("file-status"),fn=document.getElementById("file-name"),mL=document.getElementById("mode-lossless"),mO=document.getElementById("mode-optimized"),oC=document.getElementById("optimized-controls"),tK=document.getElementById("target-kb"),tS=document.getElementById("target-slider"),sL=document.getElementById("slider-label"),cB=document.getElementById("compress-btn"),oP=document.getElementById("output-panel"),pV=document.getElementById("preview"),oS=document.getElementById("original-size"),oD=document.getElementById("original-dims"),cS=document.getElementById("compressed-size"),cD=document.getElementById("compressed-dims"),qI=document.getElementById("quality-info"),fI=document.getElementById("format-info"),dB=document.getElementById("download-btn");
+    let f=null,r=null,ll=true;
+    function sM(l){ll=l;mL.className=l?"flex-1 py-2 rounded-[6px] border-2 border-black dark:border-white bg-black text-white dark:bg-white dark:text-black font-semibold text-sm tracking-[-0.04em] transition-all":"flex-1 py-2 rounded-[6px] border-2 border-border dark:border-dark-border bg-white dark:bg-dark-surface text-sm font-semibold tracking-[-0.04em] text-gray-600 dark:text-gray-400 hover:border-black dark:hover:border-white transition-all";mO.className=l?"flex-1 py-2 rounded-[6px] border-2 border-border dark:border-dark-border bg-white dark:bg-dark-surface text-sm font-semibold tracking-[-0.04em] text-gray-600 dark:text-gray-400 hover:border-black dark:hover:border-white transition-all":"flex-1 py-2 rounded-[6px] border-2 border-black dark:border-white bg-black text-white dark:bg-white dark:text-black font-semibold text-sm tracking-[-0.04em] transition-all";oC.style.display=l?"none":"block";cB.textContent=l?"Process Lossless PNG":"Optimize to Target Size"}
+    mL.onclick=()=>sM(true);mO.onclick=()=>sM(false);sM(true);
+    tS.oninput=()=>{tK.value=tS.value;sL.textContent=tS.value+" KB"};tK.oninput=()=>{tS.value=tK.value;sL.textContent=tK.value+" KB"};
+    dz.onclick=()=>fi.click();dz.ondragover=e=>{e.preventDefault();dz.classList.add("border-black","dark:border-white")};dz.ondragleave=()=>{dz.classList.remove("border-black","dark:border-white")};dz.ondrop=e=>{e.preventDefault();dz.classList.remove("border-black","dark:border-white");const file=e.dataTransfer?.files?.[0];if(file)hF(file)};fi.onchange=()=>{if(fi.files?.[0])hF(fi.files[0])};
+    function hF(file){f=file;fn.textContent=file.name;fs.classList.remove("hidden");cB.disabled=false}
+    cB.onclick=async()=>{if(!f)return;cB.disabled=true;cB.textContent="Processing...";oP.classList.add("hidden");const img=new Image();img.src=URL.createObjectURL(f);await img.decode();const w=img.naturalWidth,h=img.naturalHeight;const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d");x.drawImage(img,0,0);oS.textContent=(f.size/1024).toFixed(1)+" KB";oD.textContent=w+" × "+h+" px";if(ll){c.toBlob(blob=>{if(!blob)return;const u=URL.createObjectURL(blob);r=u;pV.src=u;cS.textContent=(blob.size/1024).toFixed(1)+" KB";cD.textContent=w+" × "+h+" px";qI.textContent="Lossless";fI.textContent="PNG";URL.revokeObjectURL(img.src);oP.classList.remove("hidden");cB.disabled=false;cB.textContent="Process Lossless PNG"},"image/png");return}const t=Math.max(1,parseInt(tK.value)||50),tb=t*1024;let lo=.1,hi=1.0,bd=null,bs=0,bq=.1;for(let i=0;i<20;i++){const mid=(lo+hi)/2,du=c.toDataURL("image/jpeg",mid),sz=Math.round(du.length*.75);if(sz<=tb){bd=du;bs=sz;bq=mid;lo=mid+.01}else{hi=mid-.01}}if(!bd){bd=c.toDataURL("image/jpeg",.1);bs=Math.round(bd.length*.75);bq=.1}r=bd;pV.src=bd;cS.textContent=(bs/1024).toFixed(1)+" KB";cD.textContent=w+" × "+h+" px";qI.textContent=Math.round(bq*100)+"%";fI.textContent="JPEG";URL.revokeObjectURL(img.src);oP.classList.remove("hidden");cB.disabled=false;cB.textContent="Optimize to Target Size"};
+    dB.onclick=()=>{if(ll&&r?.startsWith("blob:")){const a=document.createElement("a");a.href=r;a.download="lossless-image.png";a.click()}else if(r?.startsWith("data:")){const a=document.createElement("a");a.href=r;a.download="compressed-image.jpg";a.click()}};
+  })();
+  </script>

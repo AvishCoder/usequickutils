@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #fafafa;
+  --color-border: #ebebeb;
+  --color-dark-surface: #0a0a0a;
+  --color-dark-border: #1f1f1f;
+  --color-muted: #ebebeb;
+  --color-dark-muted: #222222;
+  --color-accent: #000000;
+  --color-dark-accent: #ffffff;
+}
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+body {
+  letter-spacing: -0.04em;
+}
+
+::selection {
+  background-color: #000000;
+  color: #ffffff;
+}
+.dark ::selection {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 3px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #333333;
+}
+
+*:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.dark *:focus-visible {
+  outline-color: #ffffff;
+}

@@ -1,0 +1,17 @@
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold tracking-[-0.04em] mb-2">Word Counter</h1>
+    <p class="text-gray-400 dark:text-gray-500 mb-8 tracking-[-0.04em]">Count words, characters, sentences & paragraphs.</p>
+    <textarea id="text-input" placeholder="Paste or type your text here..." class="w-full min-h-[300px] p-6 rounded-[6px] border border-border dark:border-dark-border bg-white dark:bg-dark-surface text-base font-mono tracking-[-0.04em] focus:outline-none focus:border-black dark:focus:border-white transition-colors resize-y"></textarea>
+    <div class="grid grid-cols-4 gap-4 mt-6">
+      <div class="border border-border dark:border-dark-border rounded-[6px] p-4 bg-white dark:bg-dark-surface"><span class="text-[11px] font-mono uppercase tracking-[0.05em] text-gray-400">Words</span><p id="words" class="text-2xl font-bold mt-1">0</p></div>
+      <div class="border border-border dark:border-dark-border rounded-[6px] p-4 bg-white dark:bg-dark-surface"><span class="text-[11px] font-mono uppercase tracking-[0.05em] text-gray-400">Chars</span><p id="chars" class="text-2xl font-bold mt-1">0</p></div>
+      <div class="border border-border dark:border-dark-border rounded-[6px] p-4 bg-white dark:bg-dark-surface"><span class="text-[11px] font-mono uppercase tracking-[0.05em] text-gray-400">Sentences</span><p id="sentences" class="text-2xl font-bold mt-1">0</p></div>
+      <div class="border border-border dark:border-dark-border rounded-[6px] p-4 bg-white dark:bg-dark-surface"><span class="text-[11px] font-mono uppercase tracking-[0.05em] text-gray-400">Paragraphs</span><p id="paragraphs" class="text-2xl font-bold mt-1">0</p></div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    const ta=document.getElementById("text-input"),w=document.getElementById("words"),c=document.getElementById("chars"),s=document.getElementById("sentences"),p=document.getElementById("paragraphs");
+    ta.addEventListener("input",()=>{const t=ta.value.trim();w.textContent=t?t.split(/\s+/).length+"":"0";c.textContent=ta.value.length+"";s.textContent=t?t.split(/[.!?]+/).filter(Boolean).length+"":"0";p.textContent=t?t.split(/\n\s*\n/).filter(Boolean).length+"":"0"});
+  })();
+  </script>

@@ -1,0 +1,22 @@
+---
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import ThemeToggle from "~/components/ThemeToggle.astro";
+import { ALL_TOOLS, getToolBySlug } from "~/tools";
+
+export async function getStaticPaths() {
+  return ALL_TOOLS.map((tool) => ({
+    params: { slug: tool.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const tool = getToolBySlug(slug!);
+if (!tool) return Astro.redirect("/", 301);
+
+const UIComponent = await import(`~/tools/${slug}-ui.astro`);
+---
+
+<BaseLayout title={tool.title} description={tool.description}>
+  <ThemeToggle />
+  <UIComponent.default />
+</BaseLayout>
